@@ -175,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const button = document.createElement("button");
       button.textContent = option.text;
       button.classList.add("choice");
+      button.style.backgroundImage = `linear-gradient(60deg, ${dialogueText.parentElement.style.borderColor}, #ccc, ${dialogueText.parentElement.style.borderColor})`; // Match gradient to dialogue box border
       button.addEventListener("click", () => {
         if (option.effects) {
           applyEffects(option.effects);
@@ -281,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
       logDebug("Processing story entry", entry);
 
       const {
+        background, // Add background to the destructured properties
         character,
         state,
         outfit,
@@ -291,6 +293,11 @@ document.addEventListener("DOMContentLoaded", () => {
         responses,
         branch,
       } = entry;
+
+      if (background) {
+        logDebug("Changing background", background);
+        displayBackground(background);
+      }
 
       // Handle branch objects
       if (branch) {
@@ -468,4 +475,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
     .catch((error) => logDebug("Error loading story JSON", error));
+
+  // Function to handle background rendering with fade-out, fade-in, and loading behavior
+  function displayBackground(background) {
+    const backgroundContainer =
+      document.getElementById("background-container") ||
+      (() => {
+        const container = document.createElement("div");
+        container.id = "background-container";
+        document.body.appendChild(container);
+        return container;
+      })();
+
+    const currentBackground = backgroundContainer.querySelector(
+      ".current-background",
+    );
+    const newBackground = document.createElement("img");
+    newBackground.src = `assets/backgrounds/${background}`;
+    newBackground.classList.add("new-background");
+    backgroundContainer.appendChild(newBackground);
+
+    if (currentBackground) {
+      // Fade out the current background
+      currentBackground.classList.remove("current-background");
+      currentBackground.classList.add("new-background");
+      setTimeout(() => {
+        currentBackground.remove(); // Remove the old background after fade-out
+      }, 1000);
+
+      // Wait 0.5 seconds on a black screen, then fade in the new background
+      setTimeout(() => {
+        newBackground.classList.add("current-background");
+        newBackground.classList.remove("new-background");
+      }, 1500); // 0.5 seconds delay + 1 second fade-in
+    } else {
+      // No current background, skip black screen delay and fade in faster
+      newBackground.classList.add("current-background");
+      newBackground.classList.remove("new-background");
+      newBackground.style.transition = "opacity 0.5s ease";
+      newBackground.style.opacity = "1";
+    }
+  }
 });

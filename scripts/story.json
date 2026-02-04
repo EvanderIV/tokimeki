@@ -10,6 +10,9 @@
   },
   "story": [
     {
+      "background": "school_valentines.webp"
+    },
+    {
       "character": "Sylveon",
       "dialogue": "Hewwo! Welcome to the dating sim."
     },
