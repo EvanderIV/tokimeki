@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "storyName": "Hot Stuff",
+    "description": ""
+  },
+  "constants": {
+    "paths": {
+      "predefinedConstants": "/games/tokimeki/const/default.json"
+    }
+  },
+  "story": [
+    {
+      "character": "Sylveon",
+      "dialogue": "Hewwo! Welcome to the dating sim."
+    },
+    {
+      "responses": [
+        {
+          "text": "Give Sylveon headpats",
+          "effects": { "affection": { "Sylveon": 10 } },
+          "toast": "{{char}} will remember that."
+        },
+        {
+          "text": "Ignore Sylveon",
+          "effects": { "affection": { "Sylveon": -5 } },
+          "toast": "{{char}} will remember that."
+        }
+      ]
+    },
+    {
+      "branch": {
+        "condition": "affection.Sylveon > 5",
+        "story": [
+          {
+            "dialogue": "Sylveon loves you!"
+          }
+        ]
+      }
+    },
+    {
+      "dialogue": "This is a narrator-style monologue that fires regardless of the branch."
+    },
+    {
+      "character": "Sylveon",
+      "position": "left"
+    },
+    {
+      "character": "Nagatoro",
+      "position": "right",
+      "dialogue": "Sylveon, you will exit to the left!"
+    },
+    {
+      "character": "Sylveon",
+      "position": "exit"
+    },
+    {
+      "character": "Nagatoro",
+      "dialogue": "I will now exit to the right!"
+    },
+    {
+      "character": "Nagatoro",
+      "position": "exit"
+    },
+    {
+      "dialogue": "This is the end of the tech demo."
+    }
+  ]
+}
