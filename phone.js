@@ -153,18 +153,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function to load texting chains from localStorage
-  function loadTextingChains() {
+  async function loadTextingChains() {
     const textingList = document.getElementById("texting-list");
     textingList.innerHTML = ""; // Clear existing list
 
     const savedUnlocks = JSON.parse(localStorage.getItem("unlocks")) || {};
     const texts = savedUnlocks.texts || {};
 
+    // Fetch the constants file for default colors
+    const constantsResponse = await fetch("const/default.json");
+    const constantsData = constantsResponse.ok
+      ? await constantsResponse.json()
+      : {};
+    const defaultColors = constantsData.constants?.defaultColors || {};
+
     // Reverse the order of keys to display the latest unlocks first
     const keys = Object.keys(texts).sort((a, b) => b - a);
 
-    keys.forEach((key) => {
+    for (const key of keys) {
       const textData = texts[key];
+
+      // Fetch the JSON file for the text chain
+      const response = await fetch(`scripts/texting/${textData.id}.json`);
+      if (!response.ok) {
+        console.error(`Failed to load texting data for ${textData.id}`);
+        continue;
+      }
+
+      const textJson = await response.json();
+      const primaryCharacter = textJson.metadata.primaryCharacter || "default";
 
       // Create a wrapper div for the text chain
       const wrapper = document.createElement("div");
@@ -181,14 +198,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const avatarBgWrapper = document.createElement("div");
       avatarBgWrapper.classList.add("text-chain-avatar-bg-wrapper");
 
+      // Create a wrapper for the avatar background
+      const avatarMaskWrapper = document.createElement("div");
+      avatarMaskWrapper.classList.add("text-chain-avatar-mask-wrapper");
+
       // Create an image element for the avatar
       const avatar = document.createElement("img");
-      avatar.src = "assets/ui/persona-avatar.png"; // Replace with actual avatar image
-      avatar.alt = `${textData.id} avatar`;
+      avatar.src = `assets/characters/${primaryCharacter}/texting.png`;
+      avatarMaskWrapper.style.backgroundColor =
+        defaultColors[primaryCharacter] || "transparent"; // Set background color based on constants
+      avatar.alt = `${primaryCharacter} avatar`;
       avatar.classList.add("text-chain-avatar");
 
-      avatarBgWrapper.appendChild(avatar); // Add the avatar to the background wrapper
+      // Set the background color if the primaryCharacter has a default color
+      const backgroundColor = defaultColors[primaryCharacter];
+      if (backgroundColor) {
+        avatar.style.backgroundColor = backgroundColor;
+      }
+
+      avatarMaskWrapper.appendChild(avatar); // Add the avatar to the background wrapper
       avatarWrapper.appendChild(avatarBgWrapper); // Add the background wrapper to the avatar wrapper
+      avatarBgWrapper.appendChild(avatarMaskWrapper); // Add the background wrapper to the avatar wrapper
       wrapper.appendChild(avatarWrapper); // Add the avatar wrapper to the main wrapper
 
       // Create a wrapper for the text chain name
@@ -197,13 +227,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Create a strong element for the text chain name
       const textName = document.createElement("strong");
-      textName.textContent = textData.id; // Display the text ID or name
+      textName.textContent = textJson.metadata.storyName; // Display the text ID or name
 
       nameWrapper.appendChild(textName); // Add the strong element to the name wrapper
       wrapper.appendChild(nameWrapper); // Add the name wrapper to the main wrapper
 
       textingList.appendChild(wrapper); // Add the wrapper to the list
-    });
+    }
   }
 
   // Function to handle opening a texting chain
@@ -213,7 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reveal the texting container
     const textingContainer = document.getElementById("texting-container");
     if (textingContainer) {
-      textingContainer.style.display = "block";
+      textingContainer.style.display = "flex";
+      setTimeout(() => {
+        textingContainer.classList.add("show");
+      }, 10);
     } else {
       console.error("Texting container not found.");
       return;
@@ -228,14 +261,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Load the texting chain JSON
-    fetch(`scripts/texting/${textId}.json`)
-      .then((response) => response.json())
-      .then((json) => {
-        logDebug("Fetched texting JSON for chain", json);
-        parseTextingChain(json);
-      })
-      .catch((error) => logDebug("Error loading texting JSON", error));
+    // Use playTextingChain to load and play the texting chain
+    playTextingChain(`${textId}.json`);
   }
 
   // Call the function to load texting chains on app load

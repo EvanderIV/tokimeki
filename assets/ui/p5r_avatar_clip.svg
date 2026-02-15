@@ -1,0 +1,23 @@
+<svg preserveAspectRatio="none" width="180" height="120" viewBox="0 -5 180 125" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="baseShapePath" d="M 5 5 L 20 120 L 180 100 L 170 15 Z" />
+    <clipPath id="innerClip">
+      <use href="#baseShapePath"/>
+    </clipPath>
+
+    <mask id="cutout-mask">
+      <use href="#baseShapePath" fill="white" stroke="none" />
+      
+      <use href="#baseShapePath" fill="none" stroke="black" stroke-width="8" clip-path="url(#innerClip)" />
+      <polyline points="180 15, 5 5, 15 120"
+            fill="none"
+            stroke="black"
+            stroke-width="14"
+            stroke-linejoin="miter"
+            clip-path="url(#innerClip)" />
+    </mask>
+  </defs>
+
+  <use href="#baseShapePath" fill="white" mask="url(#cutout-mask)" />
+  
+</svg>

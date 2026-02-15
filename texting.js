@@ -1,6 +1,78 @@
+function playTextingChain(jsonFilename) {
+  if (!jsonFilename || typeof jsonFilename !== "string") {
+    console.error("Invalid JSON filename provided to playTextingChain.");
+    return;
+  }
+
+  fetch(`scripts/texting/${jsonFilename}`)
+    .then((response) => response.json())
+    .then((json) => {
+      logDebug("Fetched texting JSON", json); // Debug log for fetched JSON
+
+      const predefinedConstantsPath =
+        json.constants?.paths?.predefinedConstants;
+
+      if (predefinedConstantsPath) {
+        fetch(predefinedConstantsPath)
+          .then((response) => response.json())
+          .then((constants) => {
+            storyVariables.constants = {
+              ...storyVariables.constants,
+              ...constants,
+            };
+            logDebug("Predefined constants loaded", constants);
+
+            // Parse the texting JSON after loading constants
+            parseMetadataAndConstants(json);
+            parseTextingChain(json);
+          })
+          .catch((error) =>
+            console.error("Error loading predefined constants:", error),
+          );
+      } else {
+        // If no predefined constants path, proceed with parsing the texting JSON
+        parseMetadataAndConstants(json);
+        parseTextingChain(json);
+      }
+    })
+    .catch((error) => logDebug("Error loading texting JSON", error));
+}
+
 function parseTextingChain(json) {
   console.log("Parsing texting JSON", json); // Debug log for texting chain parsing
   const textingStack = [{ story: json.story || json, progress: [] }]; // Stack to manage texting contexts with progress tracking
+
+  function peekNextState() {
+    if (textingStack.length === 0) {
+      console.log("No more content to peek at.");
+      return { stackLength: 0, nextCharacter: null, nextDialogue: null }; // Return empty state if the stack is empty
+    }
+
+    const simulateStack = [...textingStack]; // Clone the texting stack to simulate changes
+
+    while (simulateStack.length > 0) {
+      const currentContext = simulateStack[simulateStack.length - 1];
+      const { story, progress } = currentContext;
+
+      // Find the next unprocessed entry
+      const nextEntry = story.find((entry) => !progress.includes(entry));
+
+      if (nextEntry) {
+        // Return the next character, dialogue, and simulated stack length
+        return {
+          stackLength: simulateStack.length,
+          nextCharacter: nextEntry.character || null,
+          nextDialogue: nextEntry.dialogue || null,
+        };
+      }
+
+      // Simulate popping the stack if no next entry in the current context
+      simulateStack.pop();
+    }
+
+    // If the stack is empty after simulation, return empty state
+    return { stackLength: 0, nextCharacter: null, nextDialogue: null };
+  }
 
   function processTextingEntry(autoTrigger = false) {
     if (textingStack.length === 0) {
@@ -52,15 +124,40 @@ function parseTextingChain(json) {
 
       displayDialogue(dialogue, character); // Pass character to displayDialogue
 
+      // Check if there is another message in the texting stack
+      const hasNextMessage = peekNextState().stackLength > 0;
+      let typingIndicator;
+
+      if (hasNextMessage) {
+        typingIndicator = displayTypingIndicator(
+          peekNextState().nextCharacter === null, // Show user typing indicator if the next message has no character
+        ); // Show typing indicator
+        console.log(
+          "Displayed typing indicator for next message.",
+          peekNextState().stackLength,
+          peekNextState().nextCharacter,
+          peekNextState().nextDialogue,
+        );
+      } else {
+        logDebug(
+          "No more messages in the current story, not showing typing indicator.",
+          textingStack,
+        );
+      }
+
       if (autoTrigger) {
         // Automatically proceed for the first event
-        setTimeout(() => processTextingEntry(), 100);
+        setTimeout(() => {
+          if (typingIndicator) removeTypingIndicator(typingIndicator);
+          processTextingEntry();
+        }, 100);
         return;
       }
 
       // Ensure we wait for user interaction before progressing
       const waitForClick = () => {
         document.removeEventListener("click", waitForClick);
+        if (typingIndicator) removeTypingIndicator(typingIndicator);
         processTextingEntry();
       };
 
@@ -92,22 +189,6 @@ function parseTextingChain(json) {
   processTextingEntry(true); // Trigger the first event automatically
 }
 
-function playTextingChain(jsonFilename) {
-  if (!jsonFilename || typeof jsonFilename !== "string") {
-    console.error("Invalid JSON filename provided to playTextingChain.");
-    return;
-  }
-
-  fetch(`scripts/texting/${jsonFilename}`)
-    .then((response) => response.json())
-    .then((json) => {
-      logDebug("Fetched texting JSON", json); // Debug log for fetched JSON
-      parseMetadataAndConstants(json);
-      parseTextingChain(json);
-    })
-    .catch((error) => logDebug("Error loading texting JSON", error));
-}
-
 function revealTextingContainer() {
   const textingContainer = document.getElementById("texting-container");
   if (textingContainer) {
@@ -126,7 +207,29 @@ function displayDialogue(dialogue, character) {
 
   const messageItem = document.createElement("div");
   messageItem.classList.add("message-item");
-  messageItem.textContent = `${character ? character + ": " : ""}${dialogue}`;
+
+  if (character) {
+    messageItem.classList.add("character-message"); // Left-justified for characters
+
+    // Add character image
+    const characterImage = document.createElement("img");
+    characterImage.src = `assets/characters/${character}/texting.png`;
+    characterImage.alt = `${character} avatar`;
+    characterImage.classList.add("character-avatar");
+
+    // Apply background color from predefined constants
+    applyCharacterStyles(character);
+
+    messageItem.appendChild(characterImage);
+  } else {
+    messageItem.classList.add("user-message"); // Right-justified for user
+  }
+
+  const messageText = document.createElement("div");
+  messageText.classList.add("message-text");
+  messageText.textContent = dialogue;
+  messageItem.appendChild(messageText);
+
   messageList.appendChild(messageItem);
 
   // Scroll to the bottom of the message list
@@ -180,9 +283,67 @@ function displayChoices(options, processEntry, currentIndexRef) {
 }
 
 function endTextingChain() {
+  document.title = "Tokimeki";
   console.log("Texting chain has ended.");
   const textingContainer = document.getElementById("texting-container");
   if (textingContainer) {
-    textingContainer.style.display = "none";
+    textingContainer.classList.remove("show");
+    setTimeout(() => {
+      textingContainer.style.display = "none";
+    }, 500); // Match the CSS transition duration
+  }
+}
+
+function displayTypingIndicator(isUser = false) {
+  const messageList = document.getElementById("message-list");
+  if (!messageList) {
+    console.error("Message list container not found.");
+    return;
+  }
+
+  const typingIndicator = document.createElement("div");
+  typingIndicator.classList.add("message-item", "typing-indicator");
+  if (isUser) {
+    typingIndicator.classList.add("user-message");
+  } else {
+    typingIndicator.classList.add("character-message");
+  }
+
+  const typingDots = document.createElement("div");
+  typingDots.classList.add("typing-dots");
+
+  for (let i = 0; i < 3; i++) {
+    const dot = document.createElement("span");
+    typingDots.appendChild(dot);
+  }
+
+  typingIndicator.appendChild(typingDots);
+  messageList.appendChild(typingIndicator);
+
+  // Scroll to the bottom of the message list
+  messageList.scrollTop = messageList.scrollHeight;
+
+  return typingIndicator; // Return the element for removal later
+}
+
+function removeTypingIndicator(typingIndicator) {
+  if (typingIndicator && typingIndicator.parentElement) {
+    typingIndicator.parentElement.removeChild(typingIndicator);
+  }
+}
+
+function applyCharacterStyles(character) {
+  const characterStyles = storyVariables.constants?.defaultColors?.[character];
+
+  if (characterStyles) {
+    const characterImages = document.querySelectorAll(
+      `.character-avatar[alt='${character} avatar']`,
+    );
+
+    characterImages.forEach((img) => {
+      img.style.backgroundColor = characterStyles;
+    });
+  } else {
+    console.warn(`No styles found for character: ${character}`);
   }
 }

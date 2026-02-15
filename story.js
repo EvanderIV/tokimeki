@@ -610,6 +610,7 @@ function saveUnlocks(unlocks) {
 }
 
 function endStory() {
+  document.title = "Tokimeki";
   const gameContainer = document.getElementById("game-container");
   const backgroundContainer = document.getElementById("background-container");
   if (gameContainer) {

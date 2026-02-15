@@ -63,7 +63,6 @@ label {
   align-self: flex-start;
   background: #111;
   border-radius: 15px 15px 0 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -339,6 +338,7 @@ select:focus {
 
 #credits-app.show h1,
 h2,
+strong,
 p {
   color: #fff !important;
   text-shadow: none !important;
@@ -632,12 +632,32 @@ body.app-theme-unmasked-royal .text-chain-avatar-bg-wrapper {
   background-size: 90% 80%;
   background-repeat: no-repeat;
   background-position: top right;
+  width: 100%;
+  height: 100%;
+}
+
+body.app-theme-unmasked-royal .text-chain-avatar-mask-wrapper {
+  mask-image: url("assets/ui/p5r_avatar_clip.svg");
+  mask-size: 90% 80%;
+  mask-position: top right;
+  mask-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+}
+
+body.app-theme-unmasked-royal .text-chain-avatar-bg-wrapper img {
+  transform: rotate(-11deg);
+  width: auto;
+  height: 70%;
+  margin-left: 12%;
+  margin-top: 2%;
 }
 
 body.app-theme-unmasked-royal .text-chain-name-wrapper {
   background: url("assets/ui/p5r_text.svg") no-repeat;
   background-size: 100% 100%;
   background-position: left center;
+  margin-left: -1px;
 }
 
 body.app-theme-cotton-candy .text-chain-avatar-wrapper {
@@ -650,8 +670,8 @@ body.app-theme-cotton-candy .text-chain-avatar-wrapper {
 
 body.app-theme-cotton-candy .text-chain-avatar-bg-wrapper {
   background-color: #4a90e2;
-  width: 80%;
-  height: 80%;
+  width: 90%;
+  height: 90%;
   border-radius: 50%;
 }
 

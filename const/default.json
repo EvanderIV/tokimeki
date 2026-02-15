@@ -1,15 +1,16 @@
 {
   "constants": {
     "defaultColors": {
-      "Ember": "#83070788",
-      "Elle": "#1d6b7788",
-      "Jiyuu": "#c6d6ba88",
-      "Jorse": "#fda07688",
-      "Luke": "#8924bf88",
-      "Cubi": "#ff892a88",
-      "Jellyfish": "##ff310088",
-      "Goat": "#4f686488",
-      "Gigachad": "#6ED67188"
+      "Ember": "#830707",
+      "Elle": "#1d6b77",
+      "Jiyuu": "#c6d6ba",
+      "Jorse": "#fda076",
+      "Luke": "#8924bf",
+      "Cubi": "#ff892a",
+      "Jellyfish": "##ff3100",
+      "Goat": "#4f6864",
+      "Gigachad": "#6ed671",
+      "Evan": "#40c7b1"
     }
   }
 }

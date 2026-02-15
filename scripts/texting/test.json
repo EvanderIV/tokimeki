@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "chainName": "Hot Stuff",
+    "storyName": "Notice me senpai~",
     "primaryCharacter": "Evan",
     "characters": ["Evan"]
   },
@@ -38,6 +38,10 @@
           }
         ]
       }
+    },
+    {
+      "character": "Evan",
+      "dialogue": "I just wanna say, I really like you. You're super cute and I wanna get to know you better."
     },
     {
       "dialogue": "This is the end of the texting demo.",
