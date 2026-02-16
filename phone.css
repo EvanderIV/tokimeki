@@ -39,6 +39,8 @@ label {
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: 1;
+  transition: opacity 0.5s ease;
 }
 
 #phone-bezel {
@@ -596,7 +598,7 @@ body.app-theme-unmasked-royal .text-chain-wrapper:hover {
   justify-content: center;
   margin: 0 !important;
   padding: 0;
-  width: 15%;
+  width: auto;
   height: 100%;
   overflow: hidden;
   z-index: 4;
@@ -609,6 +611,17 @@ body.app-theme-unmasked-royal .text-chain-wrapper:hover {
   width: 100%;
   height: 100%;
   z-index: 5;
+  padding: 0;
+}
+
+.text-chain-avatar-mask-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  padding: 0;
 }
 
 .text-chain-name-wrapper {
@@ -622,9 +635,18 @@ body.app-theme-unmasked-royal .text-chain-wrapper:hover {
   z-index: 3;
 }
 
+.text-chain-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Persona 5 Royal theme */
+
 body.app-theme-unmasked-royal .text-chain-avatar-wrapper {
   background-image: url("assets/ui/p5r_text_avatar.svg");
   background-size: 100% 100%;
+  width: 15%;
 }
 
 body.app-theme-unmasked-royal .text-chain-avatar-bg-wrapper {
@@ -645,12 +667,12 @@ body.app-theme-unmasked-royal .text-chain-avatar-mask-wrapper {
   height: 100%;
 }
 
-body.app-theme-unmasked-royal .text-chain-avatar-bg-wrapper img {
+body.app-theme-unmasked-royal .text-chain-avatar-mask-wrapper img {
   transform: rotate(-11deg);
   width: auto;
-  height: 70%;
+  height: 65%;
   margin-left: 12%;
-  margin-top: 2%;
+  margin-top: -25%;
 }
 
 body.app-theme-unmasked-royal .text-chain-name-wrapper {
@@ -659,6 +681,8 @@ body.app-theme-unmasked-royal .text-chain-name-wrapper {
   background-position: left center;
   margin-left: -1px;
 }
+
+/* Cotton Candy theme */
 
 body.app-theme-cotton-candy .text-chain-avatar-wrapper {
   background-image: linear-gradient(-45deg, black, #888);
@@ -675,6 +699,11 @@ body.app-theme-cotton-candy .text-chain-avatar-bg-wrapper {
   border-radius: 50%;
 }
 
+body.app-theme-cotton-candy .text-chain-avatar-mask-wrapper {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
 body.app-theme-cotton-candy .text-chain-name-wrapper {
   background-color: #cdb1d6;
   border-radius: 0 12px 12px 0;
@@ -687,8 +716,36 @@ body.app-theme-cotton-candy .text-chain-name-wrapper strong {
   margin-left: 3vh;
 }
 
-.text-chain-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Sakura theme */
+
+body.app-theme-sakura .text-chain-avatar-wrapper {
+  background-image: linear-gradient(-45deg, black, #888);
+  border-radius: 50%;
+  width: 6vh;
+  height: 6vh;
+  overflow: hidden;
+}
+
+body.app-theme-sakura .text-chain-avatar-bg-wrapper {
+  background-color: #4a90e2;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+}
+
+body.app-theme-sakura .text-chain-avatar-mask-wrapper {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+body.app-theme-sakura .text-chain-name-wrapper {
+  background-color: #cdb1d6;
+  border-radius: 0 12px 12px 0;
+  height: 6vh;
+  margin-left: -3vh;
+  width: 83.5%;
+}
+
+body.app-theme-sakura .text-chain-name-wrapper strong {
+  margin-left: 3vh;
 }

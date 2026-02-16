@@ -94,7 +94,7 @@ body.app-theme-sakura #texting-container {
 /* General styles for the message list */
 .message-item {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   margin: 10px 0;
 }
 

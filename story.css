@@ -170,6 +170,8 @@ a {
   transform: translateX(-50%);
   z-index: 10;
   bottom: calc(25.35% + 2rem);
+  /* No click interaction, pass clicks straight through */
+  pointer-events: none;
 }
 
 /* Background container styles */

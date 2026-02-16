@@ -485,6 +485,7 @@ storyVariables.affection =
 // Fetch and parse the story JSON
 function playStory(jsonFilename) {
   const gameContainer = document.getElementById("game-container");
+  const phoneContainer = document.getElementById("phone-container");
   const backgroundContainer = document.getElementById("background-container");
 
   if (gameContainer) {
@@ -493,6 +494,13 @@ function playStory(jsonFilename) {
       gameContainer.style.transition = "opacity 0.5s ease";
       gameContainer.style.opacity = "1"; // Fade in after a small delay
     }, 10); // Small delay to ensure transition
+  }
+
+  if (phoneContainer) {
+    phoneContainer.style.opacity = "0";
+    setTimeout(() => {
+      phoneContainer.style.display = "none";
+    }, 500);
   }
 
   if (!jsonFilename || typeof jsonFilename !== "string") {
@@ -612,6 +620,7 @@ function saveUnlocks(unlocks) {
 function endStory() {
   document.title = "Tokimeki";
   const gameContainer = document.getElementById("game-container");
+  const phoneContainer = document.getElementById("phone-container");
   const backgroundContainer = document.getElementById("background-container");
   if (gameContainer) {
     gameContainer.style.transition = "opacity 0.5s ease";
@@ -626,5 +635,11 @@ function endStory() {
     setTimeout(() => {
       backgroundContainer.remove();
     }, 500); // Wait for the fade-out to complete
+  }
+  if (phoneContainer) {
+    phoneContainer.style.display = "flex";
+    setTimeout(() => {
+      phoneContainer.style.opacity = "1";
+    }, 10);
   }
 }

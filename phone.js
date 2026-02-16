@@ -103,7 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadTheme(theme) {
     switch (theme) {
       case "unmasked-royal":
-        document.documentElement.style.setProperty("--primary-color", "#f00");
+        document.documentElement.style.setProperty(
+          "--primary-color",
+          "#d00000",
+        );
         document.documentElement.style.setProperty("--secondary-color", "#fff");
         document.documentElement.style.setProperty("--accent-color", "#000");
         document.documentElement.style.setProperty("--text-color", "#fff"); // Default white text

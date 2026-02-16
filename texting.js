@@ -122,7 +122,7 @@ function parseTextingChain(json) {
     if (dialogue) {
       logDebug("Displaying dialogue", dialogue);
 
-      displayDialogue(dialogue, character); // Pass character to displayDialogue
+      displayText(dialogue, character); // Pass character to displayText
 
       // Check if there is another message in the texting stack
       const hasNextMessage = peekNextState().stackLength > 0;
@@ -168,7 +168,7 @@ function parseTextingChain(json) {
     // Handle responses
     if (responses) {
       logDebug("Displaying responses", responses);
-      displayChoices(responses, processTextingEntry, { current: 0 });
+      displayTextingChoices(responses, processTextingEntry, { current: 0 });
       return; // Wait for user to select a response
     }
 
@@ -198,7 +198,7 @@ function revealTextingContainer() {
   }
 }
 
-function displayDialogue(dialogue, character) {
+function displayText(dialogue, character) {
   const messageList = document.getElementById("message-list");
   if (!messageList) {
     console.error("Message list container not found.");
@@ -218,7 +218,7 @@ function displayDialogue(dialogue, character) {
     characterImage.classList.add("character-avatar");
 
     // Apply background color from predefined constants
-    applyCharacterStyles(character);
+    applyCharacterStylesTexting(character);
 
     messageItem.appendChild(characterImage);
   } else {
@@ -236,7 +236,7 @@ function displayDialogue(dialogue, character) {
   messageList.scrollTop = messageList.scrollHeight;
 }
 
-function displayChoices(options, processEntry, currentIndexRef) {
+function displayTextingChoices(options, processEntry, currentIndexRef) {
   const messageList = document.getElementById("message-list");
   if (!messageList) {
     console.error("Message list container not found.");
@@ -332,7 +332,7 @@ function removeTypingIndicator(typingIndicator) {
   }
 }
 
-function applyCharacterStyles(character) {
+function applyCharacterStylesTexting(character) {
   const characterStyles = storyVariables.constants?.defaultColors?.[character];
 
   if (characterStyles) {
