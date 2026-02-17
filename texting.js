@@ -128,7 +128,10 @@ function parseTextingChain(json) {
       displayText(dialogue, character); // Pass character to displayText
 
       // Auto-advance dialogue if autoplay is enabled in localStorage
-      if (localStorage.getItem("autoplay") === "true") {
+      if (
+        localStorage.getItem("autoplay") === "true" &&
+        peekNextState().stackLength > 0
+      ) {
         logDebug("Autoplay is enabled, setting up auto-advance for dialogue.", {
           dialogue,
         });

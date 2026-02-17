@@ -309,6 +309,38 @@ function parseStory(json) {
   console.log("Parsing story JSON", json); // Debug log for story parsing
   const storyStack = [{ story: json.story || json, progress: [] }]; // Stack to manage story contexts with progress tracking
 
+  function peekNextEntry() {
+    if (textingStack.length === 0) {
+      console.log("No more content to peek at.");
+      return { stackLength: 0, nextCharacter: null, nextDialogue: null }; // Return empty state if the stack is empty
+    }
+
+    const simulateStack = [...textingStack]; // Clone the texting stack to simulate changes
+
+    while (simulateStack.length > 0) {
+      const currentContext = simulateStack[simulateStack.length - 1];
+      const { story, progress } = currentContext;
+
+      // Find the next unprocessed entry
+      const nextEntry = story.find((entry) => !progress.includes(entry));
+
+      if (nextEntry) {
+        // Return the next character, dialogue, and simulated stack length
+        return {
+          stackLength: simulateStack.length,
+          nextCharacter: nextEntry.character || null,
+          nextDialogue: nextEntry.dialogue || null,
+        };
+      }
+
+      // Simulate popping the stack if no next entry in the current context
+      simulateStack.pop();
+    }
+
+    // If the stack is empty after simulation, return empty state
+    return { stackLength: 0, nextCharacter: null, nextDialogue: null };
+  }
+
   function processEntry(autoTrigger = false) {
     if (storyStack.length === 0) {
       console.log("Story Ended: No more content to process.");
@@ -427,7 +459,10 @@ function parseStory(json) {
       displayCharacterName(character, position); // Display the character name
 
       // Auto-advance dialogue if autoplay is enabled in localStorage
-      if (localStorage.getItem("autoplay") === "true") {
+      if (
+        localStorage.getItem("autoplay") === "true" &&
+        peekNextEntry().stackLength > 0
+      ) {
         logDebug("Autoplay is enabled, setting up auto-advance for dialogue.", {
           dialogue,
         });
