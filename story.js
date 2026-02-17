@@ -310,12 +310,12 @@ function parseStory(json) {
   const storyStack = [{ story: json.story || json, progress: [] }]; // Stack to manage story contexts with progress tracking
 
   function peekNextEntry() {
-    if (textingStack.length === 0) {
+    if (storyStack.length === 0) {
       console.log("No more content to peek at.");
       return { stackLength: 0, nextCharacter: null, nextDialogue: null }; // Return empty state if the stack is empty
     }
 
-    const simulateStack = [...textingStack]; // Clone the texting stack to simulate changes
+    const simulateStack = [...storyStack]; // Clone the story stack to simulate changes
 
     while (simulateStack.length > 0) {
       const currentContext = simulateStack[simulateStack.length - 1];
