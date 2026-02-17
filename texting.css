@@ -204,6 +204,10 @@ body.app-theme-sakura #texting-container {
   justify-self: flex-end;
 }
 
+body.app-theme-unmasked-royal .character-message .typing-dots span {
+  color: #000;
+}
+
 /* Typing dots animation */
 .typing-dots {
   display: flex;

@@ -1,3 +1,5 @@
+let autoAdvanceTimeout;
+
 function playTextingChain(jsonFilename) {
   if (!jsonFilename || typeof jsonFilename !== "string") {
     console.error("Invalid JSON filename provided to playTextingChain.");
@@ -5,6 +7,7 @@ function playTextingChain(jsonFilename) {
   }
 
   fetch(`scripts/texting/${jsonFilename}`)
+    // REPLACE WITH PATH TO PHP API AFTER TESTING
     .then((response) => response.json())
     .then((json) => {
       logDebug("Fetched texting JSON", json); // Debug log for fetched JSON
@@ -123,6 +126,32 @@ function parseTextingChain(json) {
       logDebug("Displaying dialogue", dialogue);
 
       displayText(dialogue, character); // Pass character to displayText
+
+      // Auto-advance dialogue if autoplay is enabled in localStorage
+      if (localStorage.getItem("autoplay") === "true") {
+        logDebug("Autoplay is enabled, setting up auto-advance for dialogue.", {
+          dialogue,
+        });
+        autoAdvanceStoryTimeout = setTimeout(
+          () => {
+            const event = new Event("click");
+            document.dispatchEvent(event);
+          },
+          dialogue.length > 10 ? dialogue.length * 70 : 1000,
+        );
+      }
+
+      // Clear the auto-advance timeout if the user clicks manually
+      document.addEventListener(
+        "click",
+        () => {
+          if (autoAdvanceStoryTimeout) {
+            clearTimeout(autoAdvanceStoryTimeout);
+            autoAdvanceStoryTimeout = null;
+          }
+        },
+        { once: true },
+      );
 
       // Check if there is another message in the texting stack
       const hasNextMessage = peekNextState().stackLength > 0;
@@ -346,4 +375,32 @@ function applyCharacterStylesTexting(character) {
   } else {
     console.warn(`No styles found for character: ${character}`);
   }
+}
+
+// Function to calculate delay based on dialogue length
+function calculateAutoAdvanceDelay(dialogue) {
+  const delay = Math.max(dialogue.length * 0.1, 1) * 1000; // Minimum 1 second
+  return delay;
+}
+
+// Function to handle autoplay for texting
+function setupTextingAutoPlay(dialogueElement, advanceFunction) {
+  let autoPlayTimer;
+
+  function resetAutoPlayTimer() {
+    clearTimeout(autoPlayTimer);
+    if (autoplayCheckbox.checked) {
+      const dialogue = dialogueElement.textContent || "";
+      const delay = calculateAutoAdvanceDelay(dialogue);
+      autoPlayTimer = setTimeout(() => {
+        advanceFunction();
+      }, delay);
+    }
+  }
+
+  // Reset timer on user interaction
+  dialogueElement.addEventListener("click", resetAutoPlayTimer);
+
+  // Start the timer initially
+  resetAutoPlayTimer();
 }

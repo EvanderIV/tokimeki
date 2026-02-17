@@ -1,8 +1,8 @@
 {
   "metadata": {
     "storyName": "Notice me senpai~",
-    "primaryCharacter": "Evan",
-    "characters": ["Evan"]
+    "primaryCharacter": "Frank",
+    "characters": ["Frank"]
   },
   "constants": {
     "paths": {
@@ -11,36 +11,36 @@
   },
   "story": [
     {
-      "character": "Evan",
+      "character": "Frank",
       "dialogue": "Hey kitten. This is the texting system."
     },
     {
       "responses": [
         {
           "text": "Hey handsome~",
-          "effects": { "affection": { "Evan": 10 } },
+          "effects": { "affection": { "Frank": 10 } },
           "toast": "{{char}} will remember that."
         },
         {
           "text": "Eww",
-          "effects": { "affection": { "Evan": -5 } },
+          "effects": { "affection": { "Frank": -5 } },
           "toast": "{{char}} will remember that."
         }
       ]
     },
     {
       "branch": {
-        "condition": "affection.Evan > 5",
+        "condition": "affection.Frank > 5",
         "story": [
           {
-            "character": "Evan",
+            "character": "Frank",
             "dialogue": "Damn girl, you got me blushin'"
           }
         ]
       }
     },
     {
-      "character": "Evan",
+      "character": "Frank",
       "dialogue": "I just wanna say, I really like you. You're super cute and I wanna get to know you better."
     },
     {

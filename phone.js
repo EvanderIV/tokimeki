@@ -27,8 +27,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const autoplayCheckbox = document.getElementById("autoplay");
+  // Load saved autoplay preference from localStorage
+  const savedAutoplay = localStorage.getItem("autoplay");
+  if (savedAutoplay !== null) {
+    autoplayCheckbox.checked = savedAutoplay === "true";
+  }
+
   autoplayCheckbox.addEventListener("change", () => {
-    console.log("Autoplay Story:", autoplayCheckbox.checked);
+    const isChecked = autoplayCheckbox.checked;
+    localStorage.setItem("autoplay", isChecked);
+    console.log("Autoplay Story:", isChecked);
   });
 
   const themeDropdown = document.getElementById("theme");
@@ -50,12 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Load saved theme from localStorage
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) {
-    themeDropdown.value = savedTheme;
-    updateAppThemeVisibility(savedTheme);
-  }
+  // Load saved theme from localStorage or set default theme
+  const savedTheme = localStorage.getItem("theme") || "unmasked-royal";
+  themeDropdown.value = savedTheme;
+  updateAppThemeVisibility(savedTheme);
 
   themeDropdown.addEventListener("change", () => {
     const selectedTheme = themeDropdown.value;
@@ -107,8 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
           "--primary-color",
           "#d00000",
         );
-        document.documentElement.style.setProperty("--secondary-color", "#fff");
-        document.documentElement.style.setProperty("--accent-color", "#000");
+        document.documentElement.style.setProperty("--secondary-color", "#000");
+        document.documentElement.style.setProperty("--accent-color", "#fff");
         document.documentElement.style.setProperty("--text-color", "#fff"); // Default white text
         document.documentElement.style.setProperty("--outline-color", "#000");
         document.documentElement.style.setProperty("--bezel-color", "#333");
@@ -178,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Fetch the JSON file for the text chain
       const response = await fetch(`scripts/texting/${textData.id}.json`);
+      // REPLACE WITH PATH TO PHP API AFTER TESTING
       if (!response.ok) {
         console.error(`Failed to load texting data for ${textData.id}`);
         continue;

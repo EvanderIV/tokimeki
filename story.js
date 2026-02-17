@@ -1,6 +1,7 @@
 const scene = document.getElementById("scene");
 const dialogueText = document.getElementById("dialogue-text");
 const choices = document.getElementById("choices");
+let autoAdvanceStoryTimeout;
 
 let storyVariables = {};
 
@@ -127,6 +128,27 @@ function displayDialogue(text, character) {
     dialogueContainer.style.borderColor = ""; // Reset to default if no color is found
   }
   dialogueText.textContent = text;
+
+  // Auto-advance dialogue if autoplay is enabled in localStorage
+  let autoAdvanceTimeout;
+  if (localStorage.getItem("autoplay") === "true") {
+    autoAdvanceTimeout = setTimeout(() => {
+      const event = new Event("click");
+      dialogueText.dispatchEvent(event);
+    }, 3000); // Adjust the delay as needed (e.g., 3000ms for 3 seconds)
+  }
+
+  // Clear the auto-advance timeout if the user clicks manually
+  document.addEventListener(
+    "click",
+    () => {
+      if (autoAdvanceTimeout) {
+        clearTimeout(autoAdvanceTimeout);
+        autoAdvanceTimeout = null;
+      }
+    },
+    { once: true },
+  );
 }
 
 function displayCharacterName(character, position) {
@@ -404,6 +426,32 @@ function parseStory(json) {
       displayDialogue(dialogue, character); // Pass character to displayDialogue
       displayCharacterName(character, position); // Display the character name
 
+      // Auto-advance dialogue if autoplay is enabled in localStorage
+      if (localStorage.getItem("autoplay") === "true") {
+        logDebug("Autoplay is enabled, setting up auto-advance for dialogue.", {
+          dialogue,
+        });
+        autoAdvanceStoryTimeout = setTimeout(
+          () => {
+            const event = new Event("click");
+            document.dispatchEvent(event);
+          },
+          dialogue.length > 10 ? dialogue.length * 85 : 1000,
+        );
+      }
+
+      // Clear the auto-advance timeout if the user clicks manually
+      document.addEventListener(
+        "click",
+        () => {
+          if (autoAdvanceStoryTimeout) {
+            clearTimeout(autoAdvanceStoryTimeout);
+            autoAdvanceStoryTimeout = null;
+          }
+        },
+        { once: true },
+      );
+
       if (autoTrigger) {
         // Automatically proceed for the first event
         setTimeout(() => processEntry(), 100);
@@ -509,6 +557,7 @@ function playStory(jsonFilename) {
   }
 
   fetch(`scripts/events/${jsonFilename}`)
+    // REPLACE WITH PATH TO PHP API AFTER TESTING
     .then((response) => response.json())
     .then((json) => {
       logDebug("Fetched story JSON", json); // Debug log for fetched JSON
@@ -642,4 +691,32 @@ function endStory() {
       phoneContainer.style.opacity = "1";
     }, 10);
   }
+}
+
+// Function to calculate delay based on dialogue length
+function calculateAutoAdvanceDelay(dialogue) {
+  const delay = Math.max(dialogue.length * 0.1, 1) * 1000; // Minimum 1 second
+  return delay;
+}
+
+// Function to handle autoplay for story
+function setupStoryAutoPlay(dialogueElement, advanceFunction) {
+  let autoPlayTimer;
+
+  function resetAutoPlayTimer() {
+    clearTimeout(autoPlayTimer);
+    if (autoplayCheckbox.checked) {
+      const dialogue = dialogueElement.textContent || "";
+      const delay = calculateAutoAdvanceDelay(dialogue);
+      autoPlayTimer = setTimeout(() => {
+        advanceFunction();
+      }, delay);
+    }
+  }
+
+  // Reset timer on user interaction
+  dialogueElement.addEventListener("click", resetAutoPlayTimer);
+
+  // Start the timer initially
+  resetAutoPlayTimer();
 }

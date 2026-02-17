@@ -68,7 +68,7 @@
       "dialogue": "This is the end of the tech demo.",
       "unlocks": {
         "texts": ["test"],
-        "characters": ["Evan"]
+        "characters": ["Frank"]
       }
     }
   ]
